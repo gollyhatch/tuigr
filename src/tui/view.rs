@@ -199,13 +199,18 @@ fn list_line(
             let duration = entry
                 .map(|e| library::duration_label(e.duration()))
                 .unwrap_or_default();
+            let label = if label.is_empty() { "--" } else { &label };
+            let prefix = format!("     {check} {label:<4} ");
+            let available =
+                width.saturating_sub(prefix.width() + duration.width() + 1);
+            let title = truncate(&title, available);
+            let gap = width
+                .saturating_sub(
+                    prefix.width() + title.width() + duration.width(),
+                )
+                .max(1);
             (
-                format!(
-                    "     {check} {:<4} {}  {}",
-                    if label.is_empty() { "--" } else { &label },
-                    truncate(&title, width.saturating_sub(18)),
-                    duration
-                ),
+                format!("{prefix}{title}{}{duration}", " ".repeat(gap)),
                 app.theme.track(),
             )
         }
