@@ -8,13 +8,62 @@ Rust with [`ratatui`](https://ratatui.rs), uses
 It has two faces:
 
 - a **TUI** with an artist → album → track tree, album and track editors,
-  bulk editing, search, cover art, playback, MusicBrainz lookup and 39+
-  opaline themes, and
+  bulk editing, search, cover art, playback, MusicBrainz lookup and the full
+  opaline theme collection, and
 - a **CLI** for reading fields and applying batch edits.
 
 Reads parse only tag headers and stream properties. Writes are
 read-modify-write: only fields that changed are touched, and format-specific
 items we do not model remain on the file.
+
+## Features
+
+- **Fast library browser** — artist → album → track tree with collapsible
+  levels, multiple sort modes, multi-selection, and parallel scanning.
+- **Complete tag editing** — title, artist(s), album, album artist, genre(s),
+  year/date, track and disc numbers, compilation, comment, lyrics, composer,
+  conductor, lyricist, BPM, key, ISRC, label, catalog number, barcode, media,
+  grouping, subtitle, original date, copyright, encoded-by and MusicBrainz
+  IDs.
+- **Album and bulk editing** — edit every track in an album at once, or
+  multi-select tracks across albums and edit their shared fields.
+- **Powerful search** — free text plus field queries, comparisons, negation,
+  `OR` groups, format/lossless/cover filters, and required-tag auditing.
+- **Cover art** — asynchronous cover panel, embedded and folder artwork,
+  Cover Art Archive downloads, and set/remove/extract actions.
+- **MusicBrainz lookup** — search releases, fetch tracklists, apply album
+  metadata and artwork, and match local files by title or track order.
+- **Themes** — every opaline built-in theme, with a live-preview picker on
+  `ctrl+t`; the default is Ayu Dark.
+- **File organization** — configurable rename patterns, move-to-library,
+  slugification, track-number guessing and renumbering.
+- **Playback and links** — play a track or album with your configured player,
+  open the containing folder, or launch a configurable web search.
+- **Required-tag checks** — jump to the next incomplete track in the TUI, or
+  run `tuigr check` from the CLI.
+- **Full CLI** — `list`, `get`, `set`, `modify`, `rename`, `guess`, `cover`,
+  `stats`, `check`, `lookup`, `themes`, shell completions and a man page, with
+  JSON output where useful.
+- **Configuration** — library path, player, sort order, theme, tag grouping,
+  search URL, rename format, required tags, cover behavior and scan workers.
+- **Broad format support** — MP3, FLAC, M4A/MP4, Ogg Vorbis, Opus, WAV, AIFF,
+  APE, WavPack and the other formats understood by `lofty`.
+
+## Screenshots
+
+All screenshots use the **Gruvbox Dark** theme and a small demo library.
+
+![tuigr library view with the artist and album tree, track details and album artwork](screenshots/library.png)
+
+*The library tree with expanded albums, the track editor pane and the cover panel.*
+
+![tuigr tag editor dialog](screenshots/editor.png)
+
+*Editing a tag in place; the same editor works for album-wide and multi-track edits.*
+
+![tuigr theme picker with live preview](screenshots/themes.png)
+
+*The theme picker previews every opaline theme immediately across the whole interface.*
 
 ## Supported formats
 
