@@ -580,7 +580,7 @@ fn draw_help(frame: &mut Frame, app: &App) {
 }
 
 fn draw_theme_picker(frame: &mut Frame, app: &App) {
-    let area = modal_area(frame.area(), 54, 26);
+    let area = modal_area(frame.area(), 60, 26);
     frame.render_widget(Clear, area);
     let title = if app.theme_choices.is_empty() {
         " Themes ".to_string()

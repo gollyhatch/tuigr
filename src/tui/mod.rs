@@ -244,7 +244,7 @@ mod more_tests {
         assert!(text.contains("preview"));
         let panel = app.theme.color("bg.panel");
         assert_eq!(
-            terminal.backend().buffer().cell((34, 9)).unwrap().bg,
+            terminal.backend().buffer().cell((40, 9)).unwrap().bg,
             panel
         );
     }
