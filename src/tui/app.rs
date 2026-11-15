@@ -19,6 +19,74 @@ use crate::theme::{self, UiTheme};
 use crate::tui::coverart;
 use crate::tui::input::TextInput;
 
+/// Row order of the editor panes, most used fields first.
+const EDIT_FIELDS: &[Field] = &[
+    Field::Title,
+    Field::Artist,
+    Field::Album,
+    Field::AlbumArtist,
+    Field::Genre,
+    Field::Year,
+    Field::Track,
+    Field::TrackTotal,
+    Field::Disc,
+    Field::DiscTotal,
+    Field::Compilation,
+    Field::Comment,
+    Field::Composer,
+    Field::Conductor,
+    Field::Lyricist,
+    Field::Bpm,
+    Field::Key,
+    Field::Isrc,
+    Field::Publisher,
+    Field::CatalogNumber,
+    Field::Barcode,
+    Field::Media,
+    Field::Grouping,
+    Field::Subtitle,
+    Field::OriginalDate,
+    Field::Copyright,
+    Field::EncodedBy,
+    Field::Lyrics,
+];
+
+/// Album editor rows, in `EDIT_FIELDS` order.
+const ALBUM_FIELDS: &[Field] = &[
+    Field::Album,
+    Field::AlbumArtist,
+    Field::Genre,
+    Field::Year,
+    Field::Compilation,
+    Field::Publisher,
+];
+
+/// Bulk editor rows, in `EDIT_FIELDS` order.
+const BULK_FIELDS: &[Field] = &[
+    Field::Artist,
+    Field::Album,
+    Field::AlbumArtist,
+    Field::Genre,
+    Field::Year,
+    Field::TrackTotal,
+    Field::Disc,
+    Field::DiscTotal,
+    Field::Compilation,
+    Field::Comment,
+    Field::Composer,
+    Field::Conductor,
+    Field::Lyricist,
+    Field::Publisher,
+    Field::CatalogNumber,
+    Field::Barcode,
+    Field::Media,
+    Field::Grouping,
+    Field::Subtitle,
+    Field::OriginalDate,
+    Field::Copyright,
+    Field::EncodedBy,
+];
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Pane {
     List,
@@ -846,15 +914,7 @@ impl App {
             .iter()
             .filter_map(|i| self.view.get(*i))
             .collect();
-        let fields = [
-            Field::Album,
-            Field::AlbumArtist,
-            Field::Year,
-            Field::Genre,
-            Field::Publisher,
-            Field::Compilation,
-        ];
-        let mut rows: Vec<DetailRow> = fields
+        let mut rows: Vec<DetailRow> = ALBUM_FIELDS
             .iter()
             .map(|field| {
                 let (value, mixed) = aggregate(&entries, *field);
@@ -891,36 +951,7 @@ impl App {
     }
 
     fn track_details(&self, entry: &Entry) -> Vec<DetailRow> {
-        let fields = [
-            Field::Title,
-            Field::Artist,
-            Field::Track,
-            Field::TrackTotal,
-            Field::Disc,
-            Field::DiscTotal,
-            Field::Composer,
-            Field::Lyricist,
-            Field::Bpm,
-            Field::Key,
-            Field::Isrc,
-            Field::Comment,
-            Field::Lyrics,
-            Field::Conductor,
-            Field::CatalogNumber,
-            Field::Barcode,
-            Field::Media,
-            Field::Grouping,
-            Field::Subtitle,
-            Field::OriginalDate,
-            Field::Copyright,
-            Field::EncodedBy,
-            Field::Album,
-            Field::AlbumArtist,
-            Field::Genre,
-            Field::Year,
-            Field::Publisher,
-        ];
-        let rows: Vec<DetailRow> = fields
+        EDIT_FIELDS
             .iter()
             .map(|field| DetailRow {
                 field: Some(*field),
@@ -930,8 +961,7 @@ impl App {
                 mixed: false,
                 read_only: false,
             })
-            .collect();
-        rows
+            .collect()
     }
 
     fn bulk_details(&self) -> Vec<DetailRow> {
@@ -940,31 +970,7 @@ impl App {
             .iter()
             .filter(|entry| self.selection.contains(&entry.path))
             .collect();
-        let fields = [
-            Field::Album,
-            Field::AlbumArtist,
-            Field::Genre,
-            Field::Year,
-            Field::Artist,
-            Field::Composer,
-            Field::Conductor,
-            Field::Lyricist,
-            Field::TrackTotal,
-            Field::Disc,
-            Field::DiscTotal,
-            Field::Compilation,
-            Field::Comment,
-            Field::Publisher,
-            Field::CatalogNumber,
-            Field::Barcode,
-            Field::Media,
-            Field::Grouping,
-            Field::Subtitle,
-            Field::OriginalDate,
-            Field::Copyright,
-            Field::EncodedBy,
-        ];
-        fields
+        BULK_FIELDS
             .iter()
             .map(|field| {
                 let (value, mixed) = aggregate(&entries, *field);

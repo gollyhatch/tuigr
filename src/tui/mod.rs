@@ -251,9 +251,17 @@ mod more_tests {
             field.label()
         );
         app.detail_index = index;
+        let before = app.details[index].value.clone();
 
         app.handle_key(KeyEvent::new(KeyCode::Char('e'), KeyModifiers::NONE));
         assert_eq!(app.mode, app::Mode::Edit);
+        assert_eq!(app.input.value, before);
+        for _ in 0..before.chars().count() {
+            app.handle_key(KeyEvent::new(
+                KeyCode::Backspace,
+                KeyModifiers::NONE,
+            ));
+        }
         assert_eq!(app.input.value, "");
         for ch in value.chars() {
             app.handle_key(KeyEvent::new(
@@ -266,6 +274,11 @@ mod more_tests {
 
         let saved = tags::read(&current).unwrap();
         assert_eq!(saved.metadata.get(field), value, "{}", field.label());
+        let untouched = if field == Field::Compilation {
+            "no"
+        } else {
+            ""
+        };
         for name in ["01.flac", "02.flac"] {
             let path = dir.path().join(name);
             if path == current {
@@ -274,7 +287,7 @@ mod more_tests {
             let other = tags::read(&path).unwrap();
             assert_eq!(
                 other.metadata.get(field),
-                "",
+                untouched,
                 "{} changed on {name}",
                 field.label()
             );
@@ -288,7 +301,50 @@ mod more_tests {
         edit_track_field(Field::Genre, "Ambient");
         edit_track_field(Field::Year, "1999");
         edit_track_field(Field::Publisher, "Label X");
+        edit_track_field(Field::Compilation, "yes");
         edit_track_field(Field::Comment, "one off");
+    }
+
+    #[test]
+    fn editors_put_common_fields_first() {
+        let mut app = app::App::new(Path::new("testdata"), Config::default());
+        let enter = || KeyEvent::new(KeyCode::Enter, KeyModifiers::NONE);
+
+        app.handle_key(enter()); // expand the artist
+        app.move_list(1); // album row
+        let album: Vec<&str> =
+            app.details.iter().map(|row| row.label.as_str()).collect();
+        assert_eq!(
+            &album[..6],
+            [
+                "Album",
+                "Album artist",
+                "Genre",
+                "Year",
+                "Compilation",
+                "Label"
+            ]
+        );
+
+        app.handle_key(enter()); // expand the album
+        app.move_list(1); // first track
+        app.handle_key(enter()); // focus the track editor
+        let track: Vec<&str> =
+            app.details.iter().map(|row| row.label.as_str()).collect();
+        assert_eq!(
+            &track[..8],
+            [
+                "Title",
+                "Artist",
+                "Album",
+                "Album artist",
+                "Genre",
+                "Year",
+                "Track",
+                "Track total"
+            ]
+        );
+        assert_eq!(track.last().copied(), Some("Lyrics"));
     }
 
     #[test]

@@ -183,10 +183,13 @@ editor depending on the cursor and selection.
 Editing an album row writes every track in the album. Editing a track row
 writes one file. Every row in the track editor edits that file alone, so one
 track can have its own album, album artist, genre, year, label and other
-values. Multi-selecting tracks enables the bulk editor for shared fields such
-as album, album artist, genre, year, artist, composer, conductor, lyricist,
-track total, disc, compilation, label, catalog number, barcode, media,
-grouping, subtitle, original date, copyright and encoded-by.
+values. All editors use the same row order, most used fields first: title,
+artist, album, album artist, genre, year, track and disc numbers, compilation,
+then the remaining fields with lyrics last. Multi-selecting tracks enables the
+bulk editor for shared fields such as album, album artist, genre, year,
+artist, composer, conductor, lyricist, track total, disc, compilation, label,
+catalog number, barcode, media, grouping, subtitle, original date, copyright
+and encoded-by.
 
 The optional cover panel (`cover_panel = true` or `v`) takes 40% of the width
 on terminals at least 110 columns wide and renders artwork with terminal color
