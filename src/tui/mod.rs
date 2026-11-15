@@ -79,7 +79,7 @@ mod tests {
 mod more_tests {
     use super::*;
     use crate::config::Config;
-    use crate::tags::{self, CoverAction};
+    use crate::tags::{self, CoverAction, Field};
     use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
     use ratatui::{Terminal, backend::TestBackend};
 
@@ -219,6 +219,76 @@ mod more_tests {
         assert_eq!(buffer.cell((5, 5)).unwrap().bg, base);
         assert_eq!(buffer.cell((60, 5)).unwrap().bg, panel);
         assert_eq!(buffer.cell((0, 39)).unwrap().bg, panel);
+    }
+
+    fn edit_track_field(field: Field, value: &str) {
+        let dir = tempfile::tempdir().unwrap();
+        for name in ["01.flac", "02.flac"] {
+            std::fs::copy("testdata/silence.flac", dir.path().join(name))
+                .unwrap();
+        }
+        let mut app = app::App::new(dir.path(), Config::default());
+        let enter = || KeyEvent::new(KeyCode::Enter, KeyModifiers::NONE);
+
+        app.handle_key(enter()); // expand the artist
+        app.move_list(1); // album row
+        app.handle_key(enter()); // expand the album
+        app.move_list(2); // first track
+        app.handle_key(enter()); // focus the track editor
+        assert_eq!(app.pane, app::Pane::Detail);
+
+        let current = app.current_entry().unwrap().path.clone();
+        let index = app
+            .details
+            .iter()
+            .position(|row| row.field == Some(field))
+            .unwrap_or_else(|| {
+                panic!("track editor has no {} row", field.label())
+            });
+        assert!(
+            !app.details[index].read_only,
+            "{} is read-only",
+            field.label()
+        );
+        app.detail_index = index;
+
+        app.handle_key(KeyEvent::new(KeyCode::Char('e'), KeyModifiers::NONE));
+        assert_eq!(app.mode, app::Mode::Edit);
+        assert_eq!(app.input.value, "");
+        for ch in value.chars() {
+            app.handle_key(KeyEvent::new(
+                KeyCode::Char(ch),
+                KeyModifiers::NONE,
+            ));
+        }
+        app.handle_key(enter());
+        assert_eq!(app.mode, app::Mode::Browse);
+
+        let saved = tags::read(&current).unwrap();
+        assert_eq!(saved.metadata.get(field), value, "{}", field.label());
+        for name in ["01.flac", "02.flac"] {
+            let path = dir.path().join(name);
+            if path == current {
+                continue;
+            }
+            let other = tags::read(&path).unwrap();
+            assert_eq!(
+                other.metadata.get(field),
+                "",
+                "{} changed on {name}",
+                field.label()
+            );
+        }
+    }
+
+    #[test]
+    fn track_editor_sets_every_field_on_one_track() {
+        edit_track_field(Field::Album, "Other Album");
+        edit_track_field(Field::AlbumArtist, "Various Artists");
+        edit_track_field(Field::Genre, "Ambient");
+        edit_track_field(Field::Year, "1999");
+        edit_track_field(Field::Publisher, "Label X");
+        edit_track_field(Field::Comment, "one off");
     }
 
     #[test]

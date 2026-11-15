@@ -914,8 +914,13 @@ impl App {
             Field::OriginalDate,
             Field::Copyright,
             Field::EncodedBy,
+            Field::Album,
+            Field::AlbumArtist,
+            Field::Genre,
+            Field::Year,
+            Field::Publisher,
         ];
-        let mut rows: Vec<DetailRow> = fields
+        let rows: Vec<DetailRow> = fields
             .iter()
             .map(|field| DetailRow {
                 field: Some(*field),
@@ -926,15 +931,6 @@ impl App {
                 read_only: false,
             })
             .collect();
-        rows.push(detail("Album", entry.metadata.album.clone(), true));
-        rows.push(detail(
-            "Album artist",
-            entry.metadata.album_artist.clone(),
-            true,
-        ));
-        rows.push(detail("Genre", entry.metadata.genre_string(), true));
-        rows.push(detail("Year", entry.metadata.get(Field::Year), true));
-        rows.push(detail("Label", entry.metadata.publisher.clone(), true));
         rows
     }
 
